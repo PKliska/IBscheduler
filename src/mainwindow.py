@@ -3,19 +3,19 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from ui.mainwindow import Ui_MainWindow
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from models import Base, Student
+from models import Base, Student, Subject
 from add_student import AddStudent
 
 
 class MainWindow(Ui_MainWindow):
 
     def __init__(self):
+        super().__init__()
         self.engine = create_engine('sqlite:///:memory:')
         Base.metadata.create_all(self.engine)
 
         self.Session = sessionmaker(bind=self.engine)
         self.student_model = QStandardItemModel()
-        super().__init__()
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
@@ -33,12 +33,16 @@ class MainWindow(Ui_MainWindow):
 
     def searchStudents(self, name):
         session = self.Session()
-
         self.student_model.clear()
         for i in session.query(Student).filter(Student.name.ilike('%'+name+'%')):
             it = QStandardItem()
             it.setText(i.name)
+            it.setData(i.id)
+            it.setEditable(False)
             self.student_model.appendRow(it)
+
+    def updateStudentModel(self):
+        self.searchStudents(self.studentLineEdit.text())
 
 
     def addStudent(self):
@@ -46,6 +50,7 @@ class MainWindow(Ui_MainWindow):
         content = AddStudent(self.Session())
         content.setupUi(self.dialog)
         self.dialog.exec_()
+        self.updateStudentModel()
 
     def load_file(self, filename):
         pass
