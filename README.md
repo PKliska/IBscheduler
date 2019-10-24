@@ -1,2 +1,2 @@
 # IBscheduler
-A simple wxPython program for creating IB schedules
+A simple Qt5 program for creating IB schedules
