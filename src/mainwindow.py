@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from ui.mainwindow import Ui_MainWindow
 from sqlalchemy.orm import sessionmaker
@@ -13,7 +13,6 @@ class MainWindow(Ui_MainWindow):
         super().__init__()
         self.engine = create_engine('sqlite:///:memory:')
         Base.metadata.create_all(self.engine)
-
         self.Session = sessionmaker(bind=self.engine)
         self.student_model = QStandardItemModel()
 
@@ -24,6 +23,7 @@ class MainWindow(Ui_MainWindow):
         self.actionAdd_student.triggered.connect(self.addStudent)
 
         #File menu actions
+        self.actionLoad.triggered.connect(self.loadFile)
         self.actionQuit.triggered.connect(QApplication.instance().quit)
 
         #Students dock
@@ -52,5 +52,11 @@ class MainWindow(Ui_MainWindow):
         self.dialog.exec_()
         self.updateStudentModel()
 
-    def load_file(self, filename):
-        pass
+    def loadFile(self):
+        filename = QFileDialog.getOpenFileName(caption="Load file",
+                                filter="SQLite3 file (*.sqlite3)")[0]
+        if filename:
+            self.engine.dispose()
+            self.engine = create_engine('sqlite:///'+filename)
+            Base.metadata.create_all(self.engine)
+            self.Session = sessionmaker(bind=self.engine)

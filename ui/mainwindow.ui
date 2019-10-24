@@ -33,6 +33,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionLoad"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -111,6 +112,11 @@
   <action name="actionAdd_student">
    <property name="text">
     <string>Add student</string>
+   </property>
+  </action>
+  <action name="actionLoad">
+   <property name="text">
+    <string>Load</string>
    </property>
   </action>
  </widget>
