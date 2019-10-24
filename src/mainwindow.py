@@ -23,7 +23,8 @@ class MainWindow(Ui_MainWindow):
         self.actionAdd_student.triggered.connect(self.addStudent)
 
         #File menu actions
-        self.actionLoad.triggered.connect(self.loadFile)
+        self.actionOpen.triggered.connect(self.openFile)
+        self.actionSave.triggered.connect(self.saveFile)
         self.actionQuit.triggered.connect(QApplication.instance().quit)
 
         #Students dock
@@ -63,7 +64,7 @@ class MainWindow(Ui_MainWindow):
         self.dialog.exec_()
         self.updateStudentModel()
 
-    def loadFile(self):
+    def openFile(self):
         filename = QFileDialog.getOpenFileName(caption="Load file",
                                 filter="SQLite3 file (*.sqlite3)")[0]
         if filename:
@@ -73,3 +74,6 @@ class MainWindow(Ui_MainWindow):
             self.Session = sessionmaker(bind=self.engine)
             self.session = self.Session()
             self.updateStudentModel()
+
+    def saveFile(self):
+        self.session.commit()
