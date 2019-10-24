@@ -4,17 +4,17 @@ from ui.mainwindow import Ui_MainWindow
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from models import Base, Student, Subject
-from add_student import AddStudent
+from edit_student import EditStudent
 
 
 class MainWindow(Ui_MainWindow):
 
     def __init__(self):
         super().__init__()
-        self.engine = create_engine('sqlite:///:memory:')
+        self.engine = create_engine('sqlite:///:memory:', echo=True)
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
-        self.student_model = QStandardItemModel()
+        self.session = self.Session()
 
     def setupUi(self, main_window):
         super().setupUi(main_window)
@@ -28,16 +28,20 @@ class MainWindow(Ui_MainWindow):
 
         #Students dock
         self.studentLineEdit.textChanged['QString'].connect(self.searchStudents)
+
+        self.student_model = QStandardItemModel()
         self.studentList.setModel(self.student_model)
+        self.studentList.doubleClicked['QModelIndex'].connect(self.editStudent)
+        self.updateStudentModel()
+
         self.searchStudents("")
 
     def searchStudents(self, name):
-        session = self.Session()
         self.student_model.clear()
-        for i in session.query(Student).filter(Student.name.ilike('%'+name+'%')):
+        for i in self.session.query(Student).filter(Student.name.ilike('%'+name+'%')):
             it = QStandardItem()
             it.setText(i.name)
-            it.setData(i.id)
+            it.setData(i)
             it.setEditable(False)
             self.student_model.appendRow(it)
 
@@ -47,7 +51,14 @@ class MainWindow(Ui_MainWindow):
 
     def addStudent(self):
         self.dialog = QDialog()
-        content = AddStudent(self.Session())
+        content = EditStudent(self.session)
+        content.setupUi(self.dialog)
+        self.dialog.exec_()
+        self.updateStudentModel()
+
+    def editStudent(self, idx):
+        self.dialog = QDialog()
+        content = EditStudent(self.session, self.student_model.itemFromIndex(idx).data())
         content.setupUi(self.dialog)
         self.dialog.exec_()
         self.updateStudentModel()
@@ -60,3 +71,5 @@ class MainWindow(Ui_MainWindow):
             self.engine = create_engine('sqlite:///'+filename)
             Base.metadata.create_all(self.engine)
             self.Session = sessionmaker(bind=self.engine)
+            self.session = self.Session()
+            self.updateStudentModel()
