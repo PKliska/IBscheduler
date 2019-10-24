@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, String, ForeignKey Enum
+from sqlalchemy import Table, Column, Integer, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -11,15 +11,18 @@ student_subject = Table('student_subject', Base.metadata,
                         Column('subject_id', Integer, ForeignKey('subject.id')),
                         )
 
-
+subject_time_slot = Table('subject_time_slot', Base.metadata,
+                        Column('subject_id', Integer, ForeignKey('subject.id')),
+                        Column('time_slot_id', Integer, ForeignKey('time_slot.id')),
+                        )
 
 
 class TimeSlot(Base):
     __tablename__ = 'time_slot'
 
     id = Column(Integer, primary_key=True)
-    day = Column(Enum(["MONDAY", "TUESDAY", "WEDNESDAY",
-                        "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]))
+    day = Column(Enum("MONDAY", "TUESDAY", "WEDNESDAY",
+                        "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"))
     number = Column(Integer)
     subjects = relationship("Subject",
                             secondary=subject_time_slot,
@@ -35,7 +38,7 @@ class Subject(Base):
     time_slots = relationship("TimeSlot",
                               secondary=subject_time_slot,
                               back_populates="subjects")
-                              
+
     students = relationship("Student",
                             secondary=student_subject,
                             back_populates="subjects")
