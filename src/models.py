@@ -1,5 +1,5 @@
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -11,22 +11,25 @@ student_subject = Table('student_subject', Base.metadata,
                         Column('subject_id', Integer, ForeignKey('subject.id')),
                         )
 
-subject_time_slot = Table('subject_time_slot', Base.metadata,
-                        Column('subject_id', Integer, ForeignKey('subject.id')),
-                        Column('time_slot_id', Integer, ForeignKey('time_slot.id')),
-                        )
+class Place(Base):
+    __tablename__ = 'place'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(64))
 
 
-class TimeSlot(Base):
-    __tablename__ = 'time_slot'
+class TimePlace(Base):
+    __tablename__ = 'time_place'
 
     id = Column(Integer, primary_key=True)
     day = Column(Enum("MONDAY", "TUESDAY", "WEDNESDAY",
                         "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"))
     number = Column(Integer)
-    subjects = relationship("Subject",
-                            secondary=subject_time_slot,
-                            back_populates="time_slots")
+
+    subject_id = Column(Integer, ForeignKey('subject.id'))
+
+    place_id = Column(Integer, ForeignKey('place.id'))
+    place = relationship("Place", backref='time_places')
 
 
 class Subject(Base):
@@ -34,10 +37,10 @@ class Subject(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(64))
+    abbreviation = Column(String(64))
 
-    time_slots = relationship("TimeSlot",
-                              secondary=subject_time_slot,
-                              back_populates="subjects")
+    time_places = relationship("TimePlace",
+                              backref='subject')
 
     students = relationship("Student",
                             secondary=student_subject,

@@ -5,13 +5,14 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from models import Base, Student, Subject
 from edit_student import EditStudent
+from edit_subject import EditSubject
 
 
 class MainWindow(Ui_MainWindow):
 
     def __init__(self):
         super().__init__()
-        self.engine = create_engine('sqlite:///:memory:', echo=True)
+        self.engine = create_engine('sqlite:///:memory:')
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()
@@ -21,6 +22,7 @@ class MainWindow(Ui_MainWindow):
 
         #Toolbar
         self.actionAdd_student.triggered.connect(self.addStudent)
+        self.actionAdd_subject.triggered.connect(self.addSubject)
 
         #File menu actions
         self.actionOpen.triggered.connect(self.openFile)
@@ -35,7 +37,13 @@ class MainWindow(Ui_MainWindow):
         self.studentList.doubleClicked['QModelIndex'].connect(self.editStudent)
         self.updateStudentModel()
 
-        self.searchStudents("")
+        #Subjects dock
+        self.subjectLineEdit.textChanged['QString'].connect(self.searchSubjects)
+
+        self.subject_model = QStandardItemModel()
+        self.subjectList.setModel(self.subject_model)
+        self.subjectList.doubleClicked['QModelIndex'].connect(self.editSubject)
+        self.updateSubjectModel()
 
     def searchStudents(self, name):
         self.student_model.clear()
@@ -46,23 +54,49 @@ class MainWindow(Ui_MainWindow):
             it.setEditable(False)
             self.student_model.appendRow(it)
 
+    def searchSubjects(self, name):
+        self.subject_model.clear()
+        for i in self.session.query(Subject).filter(Subject.name.ilike('%'+name+'%')):
+            it = QStandardItem()
+            it.setText(i.name)
+            it.setData(i)
+            it.setEditable(False)
+            self.subject_model.appendRow(it)
+
     def updateStudentModel(self):
         self.searchStudents(self.studentLineEdit.text())
 
+    def updateSubjectModel(self):
+        self.searchSubjects(self.subjectLineEdit.text())
+
 
     def addStudent(self):
-        self.dialog = QDialog()
+        dialog = QDialog()
         content = EditStudent(self.session)
-        content.setupUi(self.dialog)
-        self.dialog.exec_()
+        content.setupUi(dialog)
+        dialog.exec_()
         self.updateStudentModel()
 
+    def addSubject(self):
+        dialog = QDialog()
+        content = EditSubject(self.session)
+        content.setupUi(dialog)
+        dialog.exec_()
+        self.updateSubjectModel()
+
     def editStudent(self, idx):
-        self.dialog = QDialog()
+        dialog = QDialog()
         content = EditStudent(self.session, self.student_model.itemFromIndex(idx).data())
-        content.setupUi(self.dialog)
-        self.dialog.exec_()
+        content.setupUi(dialog)
+        dialog.exec_()
         self.updateStudentModel()
+
+    def editSubject(self, idx):
+        dialog = QDialog()
+        content = EditSubject(self.session, self.subject_model.itemFromIndex(idx).data())
+        content.setupUi(dialog)
+        dialog.exec_()
+        self.updateSubjectModel()
 
     def openFile(self):
         filename = QFileDialog.getOpenFileName(caption="Load file",
@@ -74,6 +108,7 @@ class MainWindow(Ui_MainWindow):
             self.Session = sessionmaker(bind=self.engine)
             self.session = self.Session()
             self.updateStudentModel()
+            self.updateSubjectModel()
 
     def saveFile(self):
         self.session.commit()

@@ -78,14 +78,14 @@
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QLineEdit" name="lineEdit_2">
+      <widget class="QLineEdit" name="subjectLineEdit">
        <property name="placeholderText">
         <string>Search</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QListView" name="listView"/>
+      <widget class="QListView" name="subjectList"/>
      </item>
     </layout>
    </widget>
@@ -101,6 +101,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionAdd_student"/>
+   <addaction name="actionAdd_subject"/>
   </widget>
   <action name="actionQuit">
    <property name="text">
@@ -132,6 +133,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionAdd_subject">
+   <property name="text">
+    <string>Add subject</string>
    </property>
   </action>
  </widget>
