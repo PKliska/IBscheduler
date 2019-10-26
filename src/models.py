@@ -1,3 +1,4 @@
+import enum
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, Enum
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
@@ -11,6 +12,15 @@ student_subject = Table('student_subject', Base.metadata,
                         Column('subject_id', Integer, ForeignKey('subject.id')),
                         )
 
+class DayOfWeek(enum.Enum):
+    MONDAY = 0
+    TUESDAY = 1
+    WEDNESDAY = 2
+    THURSDAY = 3
+    FRIDAY = 4
+    SATURDAY = 5
+    SUNDAY = 6
+
 class Place(Base):
     __tablename__ = 'place'
 
@@ -22,9 +32,8 @@ class TimePlace(Base):
     __tablename__ = 'time_place'
 
     id = Column(Integer, primary_key=True)
-    day = Column(Enum("MONDAY", "TUESDAY", "WEDNESDAY",
-                        "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"))
-    number = Column(Integer)
+    day = Column(Enum(DayOfWeek))
+    slot = Column(Integer)
 
     subject_id = Column(Integer, ForeignKey('subject.id'))
 
