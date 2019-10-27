@@ -12,7 +12,7 @@ student_subject = Table('student_subject', Base.metadata,
                         Column('subject_id', Integer, ForeignKey('subject.id')),
                         )
 
-class DayOfWeek(enum.Enum):
+class DayOfWeek(enum.IntEnum):
     MONDAY = 0
     TUESDAY = 1
     WEDNESDAY = 2
