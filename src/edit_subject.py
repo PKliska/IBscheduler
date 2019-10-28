@@ -47,7 +47,7 @@ class EditSubject(Ui_Dialog):
         for i in range(self.timeslot_model.rowCount()):
             for j in range(self.timeslot_model.columnCount()):
                 it = self.timeslot_model.item(i, j)
-                if it is not None:
+                if it is not None and it.text():
                     place = self.session.query(Place).filter(Place.name == it.text()).one_or_none()
                     if place is None:
                         messagebox = QMessageBox()

@@ -12,7 +12,8 @@ class MainWindow(Ui_MainWindow):
 
     def __init__(self):
         super().__init__()
-        self.engine = create_engine('sqlite:///:memory:')
+        self.filename = ":memory:"
+        self.engine = create_engine('sqlite:///'+self.filename)
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()
@@ -27,6 +28,7 @@ class MainWindow(Ui_MainWindow):
         #File menu actions
         self.actionOpen.triggered.connect(self.openFile)
         self.actionSave.triggered.connect(self.saveFile)
+        self.actionSave_as.triggered.connect(self.saveFileAs)
         self.actionQuit.triggered.connect(QApplication.instance().quit)
 
         #Students dock
@@ -126,16 +128,42 @@ class MainWindow(Ui_MainWindow):
         self.updateScheduleModel()
 
     def openFile(self):
-        filename = QFileDialog.getOpenFileName(caption="Load file",
+        new_filename = QFileDialog.getOpenFileName(caption="Open file",
                                 filter="SQLite3 file (*.sqlite3)")[0]
-        if filename:
+        if new_filename:
+            self.filename = new_filename
             self.engine.dispose()
-            self.engine = create_engine('sqlite:///'+filename)
+            self.engine = create_engine('sqlite:///'+self.filename)
             Base.metadata.create_all(self.engine)
             self.Session = sessionmaker(bind=self.engine)
             self.session = self.Session()
             self.updateStudentModel()
             self.updateSubjectModel()
+            self.updateScheduleModel()
 
     def saveFile(self):
-        self.session.commit()
+        if self.filename == ':memory:':
+            self.saveFileAs()
+        else:
+            self.session.commit()
+
+    def saveFileAs(self):
+        new_filename = QFileDialog.getSaveFileName(caption="Save file as",
+                                filter="SQLite3 file (*.sqlite3)")[0]
+        if new_filename:
+            new_engine = create_engine('sqlite:///'+new_filename)
+            Base.metadata.drop_all(new_engine)
+            Base.metadata.create_all(new_engine)
+            tables = Base.metadata.tables
+            for tbl in tables:
+                data = self.engine.execute(tables[tbl].select()).fetchall()
+                if data:
+                    new_engine.execute(tables[tbl].insert(), data)
+            self.engine.dispose()
+            self.engine = new_engine
+            self.Session = sessionmaker(bind=self.engine)
+            self.session = self.Session()
+            self.filename=new_filename
+            self.updateSubjectModel()
+            self.updateStudentModel()
+            self.updateScheduleModel()
