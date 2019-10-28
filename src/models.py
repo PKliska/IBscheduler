@@ -49,7 +49,8 @@ class Subject(Base):
     abbreviation = Column(String(64))
 
     time_places = relationship("TimePlace",
-                              backref='subject')
+                              backref='subject',
+                              cascade='save-update, delete, delete-orphan, merge')
 
     students = relationship("Student",
                             secondary=student_subject,

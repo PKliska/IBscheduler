@@ -3,7 +3,7 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from ui.mainwindow import Ui_MainWindow
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from models import Base, Student, Subject
+from models import Base, Student, Subject, DayOfWeek, TimePlace
 from edit_student import EditStudent
 from edit_subject import EditSubject
 
@@ -45,6 +45,11 @@ class MainWindow(Ui_MainWindow):
         self.subjectList.doubleClicked['QModelIndex'].connect(self.editSubject)
         self.updateSubjectModel()
 
+        #Main view
+        self.schedule_model = QStandardItemModel()
+        self.scheduleView.setModel(self.schedule_model)
+        self.updateScheduleModel()
+
     def searchStudents(self, name):
         self.student_model.clear()
         for i in self.session.query(Student).filter(Student.name.ilike('%'+name+'%')):
@@ -69,6 +74,17 @@ class MainWindow(Ui_MainWindow):
     def updateSubjectModel(self):
         self.searchSubjects(self.subjectLineEdit.text())
 
+    def updateScheduleModel(self):
+        self.schedule_model.clear()
+        for i in DayOfWeek:
+            for j in range(12):
+                q = self.session.query(TimePlace).filter(TimePlace.day == i, TimePlace.slot == j)
+                subjects = []
+                for tp in q:
+                    subjects.append(' '.join([tp.subject.abbreviation, tp.place.name]))
+                it = QStandardItem()
+                it.setText('\n'.join(subjects))
+                self.schedule_model.setItem(j, int(i), it)
 
     def addStudent(self):
         dialog = QDialog()
@@ -76,6 +92,7 @@ class MainWindow(Ui_MainWindow):
         content.setupUi(dialog)
         dialog.exec_()
         self.updateStudentModel()
+        self.updateScheduleModel()
 
     def addSubject(self):
         dialog = QDialog()
@@ -83,6 +100,7 @@ class MainWindow(Ui_MainWindow):
         content.setupUi(dialog)
         dialog.exec_()
         self.updateSubjectModel()
+        self.updateScheduleModel()
 
     def editStudent(self, idx):
         dialog = QDialog()
@@ -90,6 +108,7 @@ class MainWindow(Ui_MainWindow):
         content.setupUi(dialog)
         dialog.exec_()
         self.updateStudentModel()
+        self.updateScheduleModel()
 
     def editSubject(self, idx):
         dialog = QDialog()
@@ -97,6 +116,7 @@ class MainWindow(Ui_MainWindow):
         content.setupUi(dialog)
         dialog.exec_()
         self.updateSubjectModel()
+        self.updateScheduleModel()
 
     def openFile(self):
         filename = QFileDialog.getOpenFileName(caption="Load file",

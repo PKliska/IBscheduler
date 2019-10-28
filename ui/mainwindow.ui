@@ -16,10 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QTableWidget" name="tableWidget"/>
-    </item>
-    <item>
-     <widget class="QListView" name="subjectList"/>
+     <widget class="QTableView" name="scheduleView"/>
     </item>
    </layout>
   </widget>
@@ -86,6 +83,9 @@
         <string>Search</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QListView" name="subjectList"/>
      </item>
     </layout>
    </widget>

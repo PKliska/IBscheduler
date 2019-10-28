@@ -14,7 +14,7 @@ class EditSubject(Ui_Dialog):
         else:
             self.subject = subject
 
-        self.timeslot_model = QStandardItemModel(10, 7)
+        self.timeslot_model = QStandardItemModel(12, 7)
         self.timeslot_model.setHorizontalHeaderLabels(["Monday", "Tuesday",
                                                     "Wednesday", "Thursday",
                                                     "Friday", "Saturday",
