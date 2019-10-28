@@ -46,7 +46,7 @@ class MainWindow(Ui_MainWindow):
         self.updateSubjectModel()
 
         #Main view
-        self.schedule_model = QStandardItemModel()
+        self.schedule_model = QStandardItemModel(12, 7)
         self.scheduleView.setModel(self.schedule_model)
         self.updateScheduleModel()
 
@@ -76,6 +76,10 @@ class MainWindow(Ui_MainWindow):
 
     def updateScheduleModel(self):
         self.schedule_model.clear()
+        self.schedule_model.setHorizontalHeaderLabels(["Monday", "Tuesday",
+                                                    "Wednesday", "Thursday",
+                                                    "Friday", "Saturday",
+                                                    "Sunday"])
         for i in DayOfWeek:
             for j in range(12):
                 q = self.session.query(TimePlace).filter(TimePlace.day == i, TimePlace.slot == j)
