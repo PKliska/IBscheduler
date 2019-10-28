@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QHeaderView
 from ui.edit_subject import Ui_Dialog
 from sqlalchemy.sql import exists
 from models import Subject, Place, TimePlace, DayOfWeek
@@ -34,6 +34,8 @@ class EditSubject(Ui_Dialog):
         self.name.setText(self.subject.name)
         self.abbreviation.setText(self.subject.abbreviation)
         self.timeslotView.setModel(self.timeslot_model)
+        self.timeslotView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.timeslotView.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         self.buttonBox.accepted.connect(self.update_subject)
 

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QHeaderView
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 from ui.mainwindow import Ui_MainWindow
 from sqlalchemy.orm import sessionmaker
@@ -48,6 +48,8 @@ class MainWindow(Ui_MainWindow):
         #Main view
         self.schedule_model = QStandardItemModel(12, 7)
         self.scheduleView.setModel(self.schedule_model)
+        self.scheduleView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.scheduleView.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.updateScheduleModel()
 
     def searchStudents(self, name):
@@ -88,6 +90,7 @@ class MainWindow(Ui_MainWindow):
                     subjects.append(' '.join([tp.subject.abbreviation, tp.place.name]))
                 it = QStandardItem()
                 it.setText('\n'.join(subjects))
+                it.setEditable(False)
                 self.schedule_model.setItem(j, int(i), it)
 
     def addStudent(self):
