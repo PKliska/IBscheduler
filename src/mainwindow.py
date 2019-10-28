@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from models import Base, Student, Subject, DayOfWeek, TimePlace
 from edit_student import EditStudent
 from edit_subject import EditSubject
+from about import About
 
 
 class MainWindow(Ui_MainWindow):
@@ -31,6 +32,9 @@ class MainWindow(Ui_MainWindow):
         self.actionSave.triggered.connect(self.saveFile)
         self.actionSave_as.triggered.connect(self.saveFileAs)
         self.actionQuit.triggered.connect(QApplication.instance().quit)
+
+        #Help menu actions
+        self.actionAbout.triggered.connect(self.showAbout)
 
         #Students dock
         self.studentLineEdit.textChanged['QString'].connect(self.searchStudents)
@@ -190,3 +194,9 @@ class MainWindow(Ui_MainWindow):
             self.updateSubjectModel()
             self.updateStudentModel()
             self.updateScheduleModel()
+
+    def showAbout(self):
+        dialog = QDialog()
+        ui = About()
+        ui.setupUi(dialog)
+        dialog.exec_()
