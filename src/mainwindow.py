@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QHeaderView
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QHeaderView, QAbstractItemView
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QBrush, QColor
+from PyQt5.QtCore import Qt
 from ui.mainwindow import Ui_MainWindow
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -37,6 +38,8 @@ class MainWindow(Ui_MainWindow):
         self.student_model = QStandardItemModel()
         self.studentList.setModel(self.student_model)
         self.studentList.doubleClicked['QModelIndex'].connect(self.editStudent)
+        self.studentList.selectionModel().selectionChanged['QItemSelection', 'QItemSelection'].connect(self.changeSelectedStudent)
+        self.studentList.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.updateStudentModel()
 
         #Subjects dock
@@ -126,6 +129,26 @@ class MainWindow(Ui_MainWindow):
         dialog.exec_()
         self.updateSubjectModel()
         self.updateScheduleModel()
+
+    def changeSelectedStudent(self, selected, unselected):
+        tps = []
+        for s in selected:
+            for i in s.indexes():
+                student = self.student_model.itemFromIndex(i).data()
+                for subject in student.subjects:
+                    for tp in subject.time_places:
+                        tps.append((tp.slot, int(tp.day)))
+
+        crossed = QBrush(Qt.black, Qt.BDiagPattern)
+        normal = QBrush(Qt.white)
+
+        for i in range(12):
+            for j in map(int, DayOfWeek):
+                if (i, j) in tps:
+                    self.schedule_model.item(i, j).setBackground(normal)
+                else:
+                    self.schedule_model.item(i, j).setBackground(crossed)
+
 
     def openFile(self):
         new_filename = QFileDialog.getOpenFileName(caption="Open file",
