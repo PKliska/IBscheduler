@@ -3,15 +3,19 @@
 all: executable
 
 src/ui/mainwindow.py: ui/mainwindow.ui
+	mkdir -p src/ui
 	pyuic5 ui/mainwindow.ui -o src/ui/mainwindow.py
 
 src/ui/about.py: ui/about.ui
+	mkdir -p src/ui
 	pyuic5 ui/about.ui -o src/ui/about.py
 
 src/ui/edit_student.py: ui/edit_student.ui
+	mkdir -p src/ui
 	pyuic5 ui/edit_student.ui -o src/ui/edit_student.py
 
 src/ui/edit_subject.py: ui/edit_subject.ui
+	mkdir -p src/ui
 	pyuic5 ui/edit_subject.ui -o src/ui/edit_subject.py
 
 

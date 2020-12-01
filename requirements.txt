@@ -1,7 +1,7 @@
 altgraph==0.16.1
 numpy==1.17.2
-Pillow==6.2.0
-PyInstaller==3.5
+Pillow>=7.1.0
+PyInstaller>=3.6
 PyQt5==5.13.1
 PyQt5-sip==12.7.0
 PySide2==5.13.1
